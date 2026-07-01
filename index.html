@@ -7,77 +7,139 @@
 
 <style>
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: Arial, sans-serif;
 }
 
 body{
-background:#202124;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-color:white;
+    background:#202124;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    color:white;
 }
 
 .container{
-width:90%;
-max-width:700px;
-text-align:center;
+    width:90%;
+    max-width:600px;
+    text-align:center;
 }
 
+/* लोगो को रंग-बिरंगा बनाने के लिए */
 .logo{
-font-size:60px;
-margin-bottom:40px;
-color:#4285F4;
+    font-size:60px;
+    margin-bottom:30px;
+    font-weight: bold;
+    letter-spacing: -1px;
 }
+.logo span:nth-child(1) { color: #4285F4; } /* M */
+.logo span:nth-child(2) { color: #EA4335; } /* y */
+.logo span:nth-child(3) { color: #FBBC05; } /* S */
+.logo span:nth-child(4) { color: #4285F4; } /* e */
+.logo span:nth-child(5) { color: #34A853; } /* a */
+.logo span:nth-child(6) { color: #EA4335; } /* r */
+.logo span:nth-child(7) { color: #FBBC05; } /* c */
+.logo span:nth-child(8) { color: #34A853; } /* h */
 
 .search-box{
-display:flex;
-background:white;
-border-radius:50px;
-overflow:hidden;
-box-shadow:0 0 20px rgba(0,0,0,.3);
+    display:flex;
+    background:white;
+    border-radius:50px;
+    overflow:hidden;
+    box-shadow:0 4px 15px rgba(0,0,0,.5);
+    transition: 0.3s;
+}
+
+.search-box:focus-within {
+    box-shadow: 0 4px 20px rgba(66, 133, 244, 0.4);
 }
 
 .search-box input{
-flex:1;
-padding:18px;
-font-size:18px;
-border:none;
-outline:none;
+    flex:1;
+    padding:18px 25px;
+    font-size:18px;
+    border:none;
+    outline:none;
+    color: #202124;
 }
 
 .search-box button{
-padding:18px 25px;
-background:#4285F4;
-color:white;
-border:none;
-cursor:pointer;
-font-size:18px;
+    padding:18px 25px;
+    background:#4285F4;
+    color:white;
+    border:none;
+    cursor:pointer;
+    font-size:18px;
+    transition: 0.2s;
 }
 
 .search-box button:hover{
-background:#3367d6;
+    background:#3367d6;
 }
 
 #history{
-margin-top:30px;
-text-align:left;
+    margin-top:35px;
+    text-align:left;
 }
 
+/* हिस्ट्री हेडर और Clear बटन को एक लाइन में लाने के लिए */
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #3c4043;
+    padding-bottom: 10px;
+}
+
+.history-header h2 {
+    font-size: 18px;
+    color: #bdc1c6;
+}
+
+.clear-all-btn {
+    background: none;
+    border: none;
+    color: #8ab4f8;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.clear-all-btn:hover {
+    text-decoration: underline;
+}
+
+/* हिस्ट्री आइटम का नया स्टाइल */
 .item{
-background:#303134;
-padding:12px;
-margin:8px 0;
-border-radius:10px;
-cursor:pointer;
+    background:#303134;
+    padding:12px 20px;
+    margin:8px 0;
+    border-radius:25px;
+    cursor:pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.2s;
 }
 
 .item:hover{
-background:#3c4043;
+    background:#3c4043;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: #9aa0a6;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 5px;
+}
+
+.delete-btn:hover {
+    color: #ea4335;
 }
 </style>
 
@@ -86,88 +148,104 @@ background:#3c4043;
 
 <div class="container">
 
-<h1 class="logo">My Search</h1>
+    <!-- रंग-बिरंगा लोगो -->
+    <h1 class="logo">
+        <span>M</span><span>y</span><span>S</span><span>e</span><span>a</span><span>r</span><span>c</span><span>h</span>
+    </h1>
 
-<div class="search-box">
+    <div class="search-box">
+        <input id="search" type="text" placeholder="Search Anything..." autocomplete="off">
+        <button onclick="searchNow()">🔍</button>
+    </div>
 
-<input
-id="search"
-type="text"
-placeholder="Search Anything...">
-
-<button onclick="searchNow()">🔍</button>
-
-</div>
-
-<div id="history"></div>
+    <!-- हिस्ट्री सेक्शन -->
+    <div id="history"></div>
 
 </div>
 
 <script>
-
 let history = JSON.parse(localStorage.getItem("history")) || [];
-
 showHistory();
 
+// सर्च करने का फंक्शन
 function searchNow(){
+    let q = document.getElementById("search").value.trim();
+    if(q == "") return;
 
-let q=document.getElementById("search").value.trim();
+    // हिस्ट्री में सबसे ऊपर जोड़ने के लिए
+    history = [q, ...history.filter(item => item !== q)]; 
+    
+    // सिर्फ टॉप 5 सर्च रखने के लिए (स्क्रीन साफ़ दिखेगी)
+    history = history.slice(0, 5); 
 
-if(q=="") return;
+    localStorage.setItem("history", JSON.stringify(history));
+    showHistory();
+    
+    // इनपुट बॉक्स को खाली करने के लिए
+    document.getElementById("search").value = "";
 
-history.unshift(q);
-
-history=[...new Set(history)];
-
-history=history.slice(0,10);
-
-localStorage.setItem("history",JSON.stringify(history));
-
-showHistory();
-
-window.open(
-"https://www.google.com/search?q="+encodeURIComponent(q),
-"_blank"
-);
-
+    // गूगल पर सर्च खोलने के लिए
+    window.open("https://www.google.com/search?q=" + encodeURIComponent(q), "_blank");
 }
 
+// हिस्ट्री दिखाने का फंक्शन
 function showHistory(){
+    let box = document.getElementById("history");
+    
+    if(history.length === 0) {
+        box.innerHTML = "";
+        return;
+    }
 
-let box=document.getElementById("history");
+    // हेडर और Clear All बटन जोड़ना
+    box.innerHTML = `
+        <div class="history-header">
+            <h2>Recent Searches</h2>
+            <button class="clear-all-btn" onclick="clearAllHistory()">Clear all</button>
+        </div>
+    `;
 
-box.innerHTML="<h2>Recent Searches</h2>";
+    // एक-एक करके आइटम्स को डिलीट बटन के साथ जोड़ना
+    history.forEach((item, index) => {
+        box.innerHTML += `
+            <div class="item" onclick="repeatSearch('${item}', event)">
+                <span>🕒 &nbsp; ${item}</span>
+                <button class="delete-btn" onclick="deleteHistoryItem(${index}, event)">×</button>
+            </div>
+        `;
+    });
+}
 
-history.forEach(item=>{
+// पुरानी सर्च पर क्लिक करने पर दोबारा सर्च करना
+function repeatSearch(text, event){
+    // अगर यूजर ने डिलीट (×) बटन पर क्लिक किया है, तो सर्च न हो
+    if(event.target.classList.contains('delete-btn')) return;
+    
+    document.getElementById("search").value = text;
+    searchNow();
+}
 
-box.innerHTML+=`
-<div class="item" onclick="repeatSearch('${item}')">
-${item}
-</div>
-`;
+// एक सिंगल आइटम डिलीट करना
+function deleteHistoryItem(index, event) {
+    event.stopPropagation(); // ताकि parent div का click event ट्रिगर न हो
+    history.splice(index, 1);
+    localStorage.setItem("history", JSON.stringify(history));
+    showHistory();
+}
 
+// पूरी हिस्ट्री डिलीट करना
+function clearAllHistory() {
+    history = [];
+    localStorage.removeItem("history");
+    showHistory();
+}
+
+// Enter बटन दबाने पर सर्च होना
+document.getElementById("search").addEventListener("keypress", function(e){
+    if(e.key === "Enter"){
+        searchNow();
+    }
 });
-
-}
-
-function repeatSearch(text){
-
-document.getElementById("search").value=text;
-
-searchNow();
-
-}
-
-document.getElementById("search").addEventListener("keypress",function(e){
-
-if(e.key==="Enter"){
-
-searchNow();
-
-}
-
-});
-
 </script>
 
 </body>
