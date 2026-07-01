@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Search Engine</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#202124;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+color:white;
+}
+
+.container{
+width:90%;
+max-width:700px;
+text-align:center;
+}
+
+.logo{
+font-size:60px;
+margin-bottom:40px;
+color:#4285F4;
+}
+
+.search-box{
+display:flex;
+background:white;
+border-radius:50px;
+overflow:hidden;
+box-shadow:0 0 20px rgba(0,0,0,.3);
+}
+
+.search-box input{
+flex:1;
+padding:18px;
+font-size:18px;
+border:none;
+outline:none;
+}
+
+.search-box button{
+padding:18px 25px;
+background:#4285F4;
+color:white;
+border:none;
+cursor:pointer;
+font-size:18px;
+}
+
+.search-box button:hover{
+background:#3367d6;
+}
+
+#history{
+margin-top:30px;
+text-align:left;
+}
+
+.item{
+background:#303134;
+padding:12px;
+margin:8px 0;
+border-radius:10px;
+cursor:pointer;
+}
+
+.item:hover{
+background:#3c4043;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h1 class="logo">My Search</h1>
+
+<div class="search-box">
+
+<input
+id="search"
+type="text"
+placeholder="Search Anything...">
+
+<button onclick="searchNow()">🔍</button>
+
+</div>
+
+<div id="history"></div>
+
+</div>
+
+<script>
+
+let history = JSON.parse(localStorage.getItem("history")) || [];
+
+showHistory();
+
+function searchNow(){
+
+let q=document.getElementById("search").value.trim();
+
+if(q=="") return;
+
+history.unshift(q);
+
+history=[...new Set(history)];
+
+history=history.slice(0,10);
+
+localStorage.setItem("history",JSON.stringify(history));
+
+showHistory();
+
+window.open(
+"https://www.google.com/search?q="+encodeURIComponent(q),
+"_blank"
+);
+
+}
+
+function showHistory(){
+
+let box=document.getElementById("history");
+
+box.innerHTML="<h2>Recent Searches</h2>";
+
+history.forEach(item=>{
+
+box.innerHTML+=`
+<div class="item" onclick="repeatSearch('${item}')">
+${item}
+</div>
+`;
+
+});
+
+}
+
+function repeatSearch(text){
+
+document.getElementById("search").value=text;
+
+searchNow();
+
+}
+
+document.getElementById("search").addEventListener("keypress",function(e){
+
+if(e.key==="Enter"){
+
+searchNow();
+
+}
+
+});
+
+</script>
+
+</body>
+</html>
